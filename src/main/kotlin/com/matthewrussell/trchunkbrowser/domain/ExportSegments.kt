@@ -57,6 +57,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             for (segment in segments) {
                 val newWav = makeWavFile(segment)
                 val filename = generateFileName(segment.src, newWav.metadata)
+                if (!outputDir.exists()) outputDir.mkdirs()
                 WavFileWriter().write(newWav, outputDir.resolve(filename))
             }
         }
