@@ -8,26 +8,31 @@ class ConvertDirectory(private val inputDir: File) {
         val outputDir = rootDir.resolve("${inputDir.name}-out")
         return Completable
             .fromAction {
-                export(inputDir, outputDir)
+                convertDirectory(inputDir, outputDir)
             }
             .doOnError {
                 outputDir.deleteRecursively()
             }
     }
 
-    private fun export(inputDir: File, outputDir: File) {
-        val contents = inputDir.listFiles().toList()
-        val wavFiles = contents.filter {
-            it.isFile && (it.extension == "wav" || it.extension == "WAV")
+    private fun convertDirectory(inputDir: File, outputDir: File) {
+        inputDir.listFiles()?.let {
+            for (file in it.toList()) {
+                if (file.isDirectory) {
+                    convertDirectory(file, File(outputDir, file.name))
+                }
+                else {
+                    if(file.extension == "wav" || file.extension == "WAV") {
+                        convertFile(file, outputDir)
+                    }
+                }
+            }
         }
-        for (wav in wavFiles) {
-            ExportSegments(GetWavSegments(wav).segments().blockingGet())
-                .exportSeparate(outputDir)
-                .blockingAwait()
-        }
-        val subDirs = contents.filter { it.isDirectory }
-        for (sub in subDirs) {
-            export(sub, File(outputDir, sub.name))
-        }
+    }
+
+    private fun convertFile(wav: File, outputDir: File) {
+        ExportSegments(GetWavSegments(wav).segments().blockingGet())
+            .exportSeparate(outputDir)
+            .blockingAwait()
     }
 }
