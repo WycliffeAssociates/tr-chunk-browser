@@ -3,31 +3,31 @@ package com.matthewrussell.trchunkbrowser.domain
 import io.reactivex.Completable
 import java.io.File
 
-class ConvertDirectory(private val root: File) {
-    fun convert(outputDir: File = root.parentFile): Completable {
-        val outDir = outputDir.resolve("${root.name}-out")
+class ConvertDirectory(private val inputDir: File) {
+    fun convert(rootDir: File = inputDir.parentFile): Completable {
+        val outputDir = rootDir.resolve("${inputDir.name}-out")
         return Completable
             .fromAction {
-                convertInPlace(root, outDir)
+                export(inputDir, outputDir)
             }
             .doOnError {
-                outDir.deleteRecursively()
+                outputDir.deleteRecursively()
             }
     }
 
-    private fun convertInPlace(dir: File, out: File) {
-        val contents = dir.listFiles().toList()
+    private fun export(inputDir: File, outputDir: File) {
+        val contents = inputDir.listFiles().toList()
         val wavFiles = contents.filter {
             it.isFile && (it.extension == "wav" || it.extension == "WAV")
         }
         for (wav in wavFiles) {
             ExportSegments(GetWavSegments(wav).segments().blockingGet())
-                .exportSeparate(out)
+                .exportSeparate(outputDir)
                 .blockingAwait()
         }
         val subDirs = contents.filter { it.isDirectory }
         for (sub in subDirs) {
-            convertInPlace(sub, File(out, sub.name))
+            export(sub, File(outputDir, sub.name))
         }
     }
 }
