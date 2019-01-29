@@ -10,6 +10,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.File
 
+const val MODE_VERSE = "verse"
+const val MODE_CHUNK = "chunk"
+
 class ExportSegments(private val segments: List<AudioSegment>) {
     enum class MergeResult {
         SUCCESS,
@@ -56,6 +59,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         return Completable.fromAction {
             for (segment in segments) {
                 val newWav = makeWavFile(segment)
+                newWav.metadata.mode = MODE_VERSE
                 val filename = generateFileName(segment.src, newWav.metadata)
                 if (!outputDir.exists()) outputDir.mkdirs()
                 WavFileWriter().write(newWav, outputDir.resolve(filename))
@@ -74,6 +78,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
                 pair.first.forEach { it.position += acc.second }
                 Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
             }.first
+            metadata.mode = MODE_CHUNK
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
             val filename = generateFileName(segments.first().src, metadata)
