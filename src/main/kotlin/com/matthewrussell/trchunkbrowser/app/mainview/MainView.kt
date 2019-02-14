@@ -209,13 +209,18 @@ class MainView : View() {
                             val duration = segment.end - segment.begin
                             val minutes = floor(duration / 60.0)
                             val seconds = duration - minutes * 60.0
-                            label("${messages[segment.sourceMetadata.slug]} ${segment.sourceMetadata.chapter}:${segment.label}") {
+                            label("${messages[segment.sourceMetadata.slug]} " +
+                                    "${segment.sourceMetadata.chapter.padStart(2, '0')}:" +
+                                    "${segment.label.padStart(2, '0')}") {
                                 addClass(MainViewStyles.segmentTitle)
                             }
-                            val take = segment.src.nameWithoutExtension.split("_").filter { it.startsWith("t") }.last()
-                                .substring(1)
-                            label("Take $take") {
-                                addClass(MainViewStyles.segmentInfo)
+                            val takeInfo = segment.src.nameWithoutExtension.split("_").filter { it.startsWith("t") }
+                            if(takeInfo.isNotEmpty()) {
+                                val take = takeInfo.last()
+                                    .substring(1)
+                                label("Take $take") {
+                                    addClass(MainViewStyles.segmentInfo)
+                                }
                             }
                             spacer()
                             label("%02.0f:%02.2f".format(minutes, seconds)) {

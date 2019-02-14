@@ -45,8 +45,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         } else {
             file.audio.size - 1
         }
-        val audioData =  file.audio.copyOfRange(startAudioIndex, endAudioIndex)
-
+        val audioData = file.audio.copyOfRange(startAudioIndex, endAudioIndex)
         // Create the output wav file
         val marker = file.metadata.markers[markerIndex].copy(position = 0)
         val metadata = file.metadata.copy(markers = mutableListOf(marker))
@@ -90,8 +89,8 @@ class ExportSegments(private val segments: List<AudioSegment>) {
 
     private fun generateFileName(sourceFile: File, newMetadata: Metadata): String {
         val parts = sourceFile.nameWithoutExtension.split("_")
-        val verseWidth = parts.filter { it.startsWith("v") }.last().split("-").first().length - 1
-        val chapterWidth = parts.filter { it.startsWith("c") }.last().length - 1
-        return newMetadata.toFilename(parts.last(), chapterWidth, verseWidth)
+        val takePart = parts.filter { it.startsWith("t") }
+        val takeInfo = if(takePart.isNotEmpty()) takePart.last() else "t01"
+        return newMetadata.toFilename(takeInfo)
     }
 }

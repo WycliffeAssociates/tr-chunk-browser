@@ -22,7 +22,12 @@ class ConvertDirectory(private val inputDir: File) {
                     convertDirectory(file, File(outputDir, file.name))
                 }
                 else {
-                    if(file.extension == "wav" || file.extension == "WAV") {
+                    // Skip non-wav files and files without verse information
+                    // Usually it's the chapter compilation files
+                    val parts = file.nameWithoutExtension.split("_")
+                    val verseWidth = parts.filter { it.startsWith("v") }
+
+                    if((file.extension.toLowerCase() == "wav") && verseWidth.isNotEmpty()) {
                         convertFile(file, outputDir)
                     }
                 }
