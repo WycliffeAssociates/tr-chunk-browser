@@ -214,7 +214,8 @@ class MainView : View() {
                                     "${segment.label.padStart(2, '0')}") {
                                 addClass(MainViewStyles.segmentTitle)
                             }
-                            val takeInfo = segment.src.nameWithoutExtension.split("_").filter { it.startsWith("t") }
+                            val takeInfo = segment.src.nameWithoutExtension.split("_")
+                                .filter { it.matches("t\\d+$".toRegex()) }
                             if(takeInfo.isNotEmpty()) {
                                 val take = takeInfo.last()
                                     .substring(1)
