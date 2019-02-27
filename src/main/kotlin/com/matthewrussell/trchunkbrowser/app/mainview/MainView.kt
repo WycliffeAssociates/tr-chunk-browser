@@ -209,6 +209,7 @@ class MainView : View() {
                             val duration = segment.end - segment.begin
                             val minutes = floor(duration / 60.0)
                             val seconds = duration - minutes * 60.0
+
                             label("${messages[segment.sourceMetadata.slug]} " +
                                     "${segment.sourceMetadata.chapter.padStart(2, '0')}:" +
                                     "${segment.label.padStart(2, '0')}") {

@@ -26,8 +26,18 @@ class ConvertDirectory(private val inputDir: File) {
                     // Usually it's the chapter compilation files
                     val parts = file.nameWithoutExtension.split("_")
                     val verseWidth = parts.filter { it.startsWith("v") }
+                    var shouldSkip = verseWidth.isEmpty()
 
-                    if((file.extension.toLowerCase() == "wav") && verseWidth.isNotEmpty()) {
+                    // If there is only one file (compiled chapter) in directory
+                    // then convert it
+                    if(verseWidth.isEmpty()) {
+                        val parentDir = file.parentFile
+                        if (parentDir.listFiles().size == 1) {
+                            shouldSkip = false
+                        }
+                    }
+
+                    if((file.extension.toLowerCase() == "wav") && !shouldSkip) {
                         convertFile(file, outputDir)
                     }
                 }
