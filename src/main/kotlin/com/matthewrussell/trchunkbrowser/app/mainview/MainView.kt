@@ -25,9 +25,29 @@ class MainView : View() {
     override val root = stackpane {
         vbox {
             addClass(MainViewStyles.root)
-            add(JFXSnackbar(this).apply {
+            add(JFXSnackbar(this).apply { // Progress snackbar
+                viewModel.snackBarProgress.subscribe { progress ->
+                    if(progress < 100) {
+                        enqueue(JFXSnackbar.SnackbarEvent(
+                            messages["export_in_progress"],
+                            "",
+                            0,
+                            true,
+                            null))
+                    } else {
+                        // wait until snackbar is shown to close it
+                        while (!this.isVisible) {
+                            Thread.sleep(200)
+                        }
+                        this.close()
+                    }
+                }
+            })
+            add(JFXSnackbar(this).apply { // Messages snackbar
                 viewModel.snackBarMessages.subscribe {
-                    enqueue(JFXSnackbar.SnackbarEvent(it))
+                    enqueue(JFXSnackbar.SnackbarEvent(it, "OK", 0, true, EventHandler {
+                        this.close()
+                    }))
                 }
             })
             viewModel.confirmConvertDirectory.subscribe {
