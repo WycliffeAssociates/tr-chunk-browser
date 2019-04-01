@@ -1,5 +1,6 @@
 package com.matthewrussell.trchunkbrowser.app.mainview
 
+import com.github.thomasnield.rxkotlinfx.toObservable
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.controls.JFXCheckBox
 import com.jfoenix.controls.JFXDialog
@@ -35,11 +36,13 @@ class MainView : View() {
                             true,
                             null))
                     } else {
-                        // wait until snackbar is shown to close it
-                        while (!this.isVisible) {
-                            Thread.sleep(200)
-                        }
-                        this.close()
+                        this.visibleProperty()
+                            .toObservable()
+                            .takeUntil { it }
+                            .doOnComplete {
+                                this.close()
+                            }
+                            .subscribe()
                     }
                 }
             })
@@ -235,12 +238,12 @@ class MainView : View() {
                                     "${segment.label.padStart(2, '0')}") {
                                 addClass(MainViewStyles.segmentTitle)
                             }
-                            val takeInfo = segment.src.nameWithoutExtension.split("_")
-                                .filter { it.matches("t\\d+$".toRegex()) }
-                            if(takeInfo.isNotEmpty()) {
-                                val take = takeInfo.last()
-                                    .substring(1)
-                                label("Take $take") {
+                            val takeInfo = "t\\d+$".toRegex()
+                                .find(segment.src.nameWithoutExtension)
+                                ?.value?.substring(1)
+
+                            if(takeInfo !== null) {
+                                label("Take $takeInfo") {
                                     addClass(MainViewStyles.segmentInfo)
                                 }
                             }
