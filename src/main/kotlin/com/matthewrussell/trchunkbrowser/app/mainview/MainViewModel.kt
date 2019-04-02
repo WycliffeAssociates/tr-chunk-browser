@@ -23,6 +23,7 @@ class MainViewModel : ViewModel() {
     val selectedSegments = FXCollections.observableArrayList<AudioSegment>()
     val selectedCount = selectedSegments.sizeProperty
     val snackBarMessages = PublishSubject.create<String>()
+    val snackBarProgress = PublishSubject.create<Int>()
     val confirmConvertDirectory = PublishSubject.create<File>()
 
     fun importFile(file: File) {
@@ -31,7 +32,7 @@ class MainViewModel : ViewModel() {
 //            convertDirectory(file)
             return
         }
-        if (file.extension != "wav" && file.extension != "WAV") {
+        if (file.extension.toLowerCase() != "wav") {
             snackBarMessages.onNext(messages["not_wav_file"])
             return
         }
@@ -59,7 +60,11 @@ class MainViewModel : ViewModel() {
     fun convertDirectory(dir: File) {
         ConvertDirectory(dir)
             .convert()
+            .doOnSubscribe {
+                snackBarProgress.onNext(0)
+            }
             .doOnComplete {
+                snackBarProgress.onNext(100)
                 snackBarMessages.onNext(messages["done_exporting"])
             }
             .onErrorResumeNext {
