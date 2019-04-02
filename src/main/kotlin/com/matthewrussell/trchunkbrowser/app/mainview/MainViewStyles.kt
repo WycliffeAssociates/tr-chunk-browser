@@ -22,6 +22,7 @@ class MainViewStyles : Stylesheet() {
         val bigDragTarget by cssclass()
         val jfxSnackbarContent by cssclass()
         val jfxSnackbarToast by cssclass()
+        val jfxSnackbarAction by cssclass()
 
         val bgColor = c("#ffffff")
         val primaryColor = c("#FF6C6C")
@@ -116,6 +117,9 @@ class MainViewStyles : Stylesheet() {
                 backgroundRadius += box(4.px)
             }
             jfxSnackbarToast {
+                textFill = Color.WHITE
+            }
+            jfxSnackbarAction {
                 textFill = Color.WHITE
             }
 

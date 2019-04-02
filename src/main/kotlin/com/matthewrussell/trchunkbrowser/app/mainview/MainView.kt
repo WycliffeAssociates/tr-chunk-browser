@@ -1,5 +1,6 @@
 package com.matthewrussell.trchunkbrowser.app.mainview
 
+import com.github.thomasnield.rxkotlinfx.toObservable
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.controls.JFXCheckBox
 import com.jfoenix.controls.JFXDialog
@@ -25,9 +26,34 @@ class MainView : View() {
     override val root = stackpane {
         vbox {
             addClass(MainViewStyles.root)
-            add(JFXSnackbar(this).apply {
-                viewModel.snackBarMessages.subscribe {
-                    enqueue(JFXSnackbar.SnackbarEvent(it))
+            add(JFXSnackbar(this).apply { // Progress snackbar
+                viewModel.snackBarProgress.subscribe { progress ->
+                    if(progress < 100) {
+                        enqueue(JFXSnackbar.SnackbarEvent(
+                            messages["export_in_progress"],
+                            "",
+                            0,
+                            true,
+                            null
+                        ))
+                    } else {
+                        this.visibleProperty()
+                            .toObservable()
+                            .takeUntil { it }
+                            .doOnComplete { this.close() }
+                            .subscribe()
+                    }
+                }
+            })
+            add(JFXSnackbar(this).apply { // Messages snackbar
+                viewModel.snackBarMessages.subscribe { message ->
+                    enqueue(JFXSnackbar.SnackbarEvent(
+                        message,
+                        "OK",
+                        0,
+                        true,
+                        EventHandler { this.close() }
+                    ))
                 }
             })
             viewModel.confirmConvertDirectory.subscribe {
@@ -209,13 +235,20 @@ class MainView : View() {
                             val duration = segment.end - segment.begin
                             val minutes = floor(duration / 60.0)
                             val seconds = duration - minutes * 60.0
-                            label("${messages[segment.sourceMetadata.slug]} ${segment.sourceMetadata.chapter}:${segment.label}") {
+
+                            label("${messages[segment.sourceMetadata.slug]} " +
+                                    "${segment.sourceMetadata.chapter.padStart(2, '0')}:" +
+                                    "${segment.label.padStart(2, '0')}") {
                                 addClass(MainViewStyles.segmentTitle)
                             }
-                            val take = segment.src.nameWithoutExtension.split("_").filter { it.startsWith("t") }.last()
-                                .substring(1)
-                            label("Take $take") {
-                                addClass(MainViewStyles.segmentInfo)
+                            val takeNum = "t\\d+$".toRegex()
+                                .find(segment.src.nameWithoutExtension)
+                                ?.value?.substring(1)
+
+                            if(takeNum !== null) {
+                                label("Take $takeNum") {
+                                    addClass(MainViewStyles.segmentInfo)
+                                }
                             }
                             spacer()
                             label("%02.0f:%02.2f".format(minutes, seconds)) {
