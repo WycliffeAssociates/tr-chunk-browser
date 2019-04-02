@@ -238,12 +238,12 @@ class MainView : View() {
                                     "${segment.label.padStart(2, '0')}") {
                                 addClass(MainViewStyles.segmentTitle)
                             }
-                            val takeInfo = "t\\d+$".toRegex()
+                            val takeNum = "t\\d+$".toRegex()
                                 .find(segment.src.nameWithoutExtension)
                                 ?.value?.substring(1)
 
-                            if(takeInfo !== null) {
-                                label("Take $takeInfo") {
+                            if(takeNum !== null) {
+                                label("Take $takeNum") {
                                     addClass(MainViewStyles.segmentInfo)
                                 }
                             }
