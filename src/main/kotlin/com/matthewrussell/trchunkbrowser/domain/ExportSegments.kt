@@ -88,9 +88,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
     }
 
     private fun generateFileName(sourceFile: File, newMetadata: Metadata): String {
-        val parts = sourceFile.nameWithoutExtension.split("_")
-        val takePart = parts.filter { it.matches("t\\d+$".toRegex()) }
-        val takeInfo = if(takePart.isNotEmpty()) takePart.last() else "t01"
-        return newMetadata.toFilename(takeInfo)
+        val takeInfo = "t\\d+$".toRegex().find(sourceFile.nameWithoutExtension)?.value
+        return newMetadata.toFilename(takeInfo ?: "t01")
     }
 }
