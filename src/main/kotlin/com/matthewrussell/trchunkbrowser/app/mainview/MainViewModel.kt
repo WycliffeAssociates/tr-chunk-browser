@@ -31,7 +31,7 @@ class MainViewModel : ViewModel() {
 //            convertDirectory(file)
             return
         }
-        if (file.extension != "wav" && file.extension != "WAV") {
+        if (file.extension.toLowerCase() != "wav") {
             snackBarMessages.onNext(messages["not_wav_file"])
             return
         }

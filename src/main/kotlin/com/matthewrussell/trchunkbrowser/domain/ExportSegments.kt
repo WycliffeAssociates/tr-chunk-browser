@@ -10,6 +10,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.File
 
+const val MODE_VERSE = "verse"
+const val MODE_CHUNK = "chunk"
+
 class ExportSegments(private val segments: List<AudioSegment>) {
     enum class MergeResult {
         SUCCESS,
@@ -40,10 +43,9 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         val endAudioIndex = if (markerIndex < file.metadata.markers.size - 1) {
             file.metadata.markers[markerIndex + 1].position * BITS_PER_SAMPLE / 8
         } else {
-            file.audio.size - 1
+            file.audio.size
         }
-        val audioData =  file.audio.copyOfRange(startAudioIndex, endAudioIndex)
-
+        val audioData = file.audio.copyOfRange(startAudioIndex, endAudioIndex)
         // Create the output wav file
         val marker = file.metadata.markers[markerIndex].copy(position = 0)
         val metadata = file.metadata.copy(markers = mutableListOf(marker))
@@ -56,7 +58,9 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         return Completable.fromAction {
             for (segment in segments) {
                 val newWav = makeWavFile(segment)
+                newWav.metadata.mode = MODE_VERSE
                 val filename = generateFileName(segment.src, newWav.metadata)
+                if (!outputDir.exists()) outputDir.mkdirs()
                 WavFileWriter().write(newWav, outputDir.resolve(filename))
             }
         }
@@ -73,6 +77,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
                 pair.first.forEach { it.position += acc.second }
                 Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
             }.first
+            metadata.mode = MODE_CHUNK
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
             val filename = generateFileName(segments.first().src, metadata)
@@ -84,8 +89,8 @@ class ExportSegments(private val segments: List<AudioSegment>) {
 
     private fun generateFileName(sourceFile: File, newMetadata: Metadata): String {
         val parts = sourceFile.nameWithoutExtension.split("_")
-        val verseWidth = parts.filter { it.startsWith("v") }.last().split("-").first().length - 1
-        val chapterWidth = parts.filter { it.startsWith("c") }.last().length - 1
-        return newMetadata.toFilename(parts.last(), chapterWidth, verseWidth)
+        val takePart = parts.filter { it.matches("t\\d+$".toRegex()) }
+        val takeInfo = if(takePart.isNotEmpty()) takePart.last() else "t01"
+        return newMetadata.toFilename(takeInfo)
     }
 }
