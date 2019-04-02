@@ -34,23 +34,26 @@ class MainView : View() {
                             "",
                             0,
                             true,
-                            null))
+                            null
+                        ))
                     } else {
                         this.visibleProperty()
                             .toObservable()
                             .takeUntil { it }
-                            .doOnComplete {
-                                this.close()
-                            }
+                            .doOnComplete { this.close() }
                             .subscribe()
                     }
                 }
             })
             add(JFXSnackbar(this).apply { // Messages snackbar
-                viewModel.snackBarMessages.subscribe {
-                    enqueue(JFXSnackbar.SnackbarEvent(it, "OK", 0, true, EventHandler {
-                        this.close()
-                    }))
+                viewModel.snackBarMessages.subscribe { message ->
+                    enqueue(JFXSnackbar.SnackbarEvent(
+                        message,
+                        "OK",
+                        0,
+                        true,
+                        EventHandler { this.close() }
+                    ))
                 }
             })
             viewModel.confirmConvertDirectory.subscribe {
