@@ -18,7 +18,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "io.reactivex.rxjava2:rxkotlin:2.3.0"
     implementation 'com.github.thomasnield:rxkotlinfx:2.2.2'
-    implementation 'com.github.WycliffeAssociates:tr-wav:0.2.2'
+    implementation 'com.github.WycliffeAssociates:tr-wav:0.2.3'
     implementation 'no.tornado:tornadofx:1.7.17'
     //FontAwesomeFX
     implementation "de.jensd:fontawesomefx-commons:9.1.2-jpms"
