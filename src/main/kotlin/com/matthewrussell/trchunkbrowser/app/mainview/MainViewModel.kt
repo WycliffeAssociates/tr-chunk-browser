@@ -4,6 +4,7 @@ import com.github.thomasnield.rxkotlinfx.observeOnFx
 import com.matthewrussell.trchunkbrowser.domain.ConvertDirectory
 import com.matthewrussell.trchunkbrowser.domain.ExportSegments
 import com.matthewrussell.trchunkbrowser.domain.GetWavSegments
+import com.matthewrussell.trchunkbrowser.domain.sortedByLabel
 import com.matthewrussell.trchunkbrowser.model.AudioSegment
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
@@ -33,12 +34,12 @@ class MainViewModel : ViewModel() {
             return
         }
         if (file.extension.toLowerCase() != "wav") {
-            snackBarMessages.onNext(messages["not_wav_file"])
+            snackBarMessages.onNext(messages.getString("not_wav_file"))
             return
         }
 
         if (segments.map { it.src.name }.contains(file.name)) {
-            snackBarMessages.onNext(messages["file_already_imported"])
+            snackBarMessages.onNext(messages.getString("file_already_imported"))
             return
         }
 
@@ -47,12 +48,13 @@ class MainViewModel : ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOnFx()
             .onErrorReturn {
-                snackBarMessages.onNext(messages["import_error"])
+                println(it)
+                snackBarMessages.onNext(messages.getString("import_error"))
                 listOf()
             }
             .doOnSuccess { retrieved ->
                 segments.addAll(retrieved)
-                segments.setAll(segments.sortedBy { it.sort })
+                segments.setAll(segments.sortedByLabel())
             }
             .subscribe()
     }
@@ -65,11 +67,11 @@ class MainViewModel : ViewModel() {
             }
             .doOnComplete {
                 snackBarProgress.onNext(100)
-                snackBarMessages.onNext(messages["done_exporting"])
+                snackBarMessages.onNext(messages.getString("done_exporting"))
             }
             .onErrorResumeNext {
                 Completable.fromAction {
-                    snackBarMessages.onNext(messages["export_error"])
+                    snackBarMessages.onNext(messages.getString("export_error"))
                 }
             }
             .subscribeOn(Schedulers.io())
@@ -81,7 +83,7 @@ class MainViewModel : ViewModel() {
             .exportSeparate(outputDir)
             .observeOnFx()
             .subscribe {
-                snackBarMessages.onNext(messages["done_exporting"])
+                snackBarMessages.onNext(messages.getString("done_exporting"))
             }
         clearSelected()
     }
@@ -92,7 +94,9 @@ class MainViewModel : ViewModel() {
             .observeOnFx()
             .subscribe { result ->
                 if (result == ExportSegments.MergeResult.SUCCESS) {
-                    snackBarMessages.onNext(messages["done_exporting"])
+                    snackBarMessages.onNext(messages.getString("done_exporting"))
+                } else {
+                    snackBarMessages.onNext(messages.getString("export_error"))
                 }
             }
         clearSelected()
@@ -105,7 +109,7 @@ class MainViewModel : ViewModel() {
 
     fun select(segment: AudioSegment) {
         if (!selectedSegments.contains(segment)) selectedSegments.add(segment)
-        selectedSegments.sortBy { it.sort }
+        selectedSegments.sortedByLabel()
     }
 
     fun deselect(segment: AudioSegment) {

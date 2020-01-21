@@ -20,7 +20,7 @@ class MainView : View() {
 
     init {
         importStylesheet<MainViewStyles>()
-        title = messages["app_name"]
+        title = messages.getString("app_name")
     }
 
     override val root = stackpane {
@@ -30,7 +30,7 @@ class MainView : View() {
                 viewModel.snackBarProgress.subscribe { progress ->
                     if(progress < 100) {
                         enqueue(JFXSnackbar.SnackbarEvent(
-                            messages["export_in_progress"],
+                            messages.getString("export_in_progress"),
                             "",
                             0,
                             true,
@@ -61,10 +61,10 @@ class MainView : View() {
                     dialogContainer = this@stackpane
                     isOverlayClose = false
                     content = MaterialDialogContent().apply {
-                        title = messages["convert_folder_title"]
-                        message = messages["convert_folder_message"]
-                        confirmButtonText = messages["split"].toUpperCase()
-                        cancelButtonText = messages["cancel"].toUpperCase()
+                        title = messages.getString("convert_folder_title")
+                        message = messages.getString("convert_folder_message")
+                        confirmButtonText = messages.getString("split").toUpperCase()
+                        cancelButtonText = messages.getString("cancel").toUpperCase()
                         confirmButton.action {
                             viewModel.convertDirectory(it)
                             close()
@@ -81,13 +81,13 @@ class MainView : View() {
                 hbox {
                     hgrow = Priority.ALWAYS
                     addClass(MainViewStyles.barContent)
-                    label(messages["app_name"]) {
-                        visibleProperty().bind(viewModel.selectedCount.eq(0))
-                        managedProperty().bind(visibleProperty())
+                    label(messages.getString("app_name")) {
+                        visibleWhen(viewModel.selectedCount.eq(0))
+                        managedWhen(visibleProperty())
                     }
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.selectedCount.gt(0))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.gt(0))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CLOSE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
@@ -96,91 +96,91 @@ class MainView : View() {
                         }
                     })
                     label(viewModel.selectedCount.asString()) {
-                        visibleProperty().bind(viewModel.selectedCount.gt(0))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.gt(0))
+                        managedWhen(visibleProperty())
                     }
                     spacer()
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.selectedCount.eq(1))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.eq(1))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.SHARE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["export"].toUpperCase()
+                        text = messages.getString("export").toUpperCase()
                         action {
-                            chooseDirectory(messages["choose_output_folder"])?.let {
+                            chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.split(it)
                             }
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.selectedCount.gt(1))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.gt(1))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CALL_SPLIT, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["split"].toUpperCase()
+                        text = messages.getString("split").toUpperCase()
                         action {
-                            chooseDirectory(messages["choose_output_folder"])?.let {
+                            chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.split(it)
                             }
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.selectedCount.gt(1))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.gt(1))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CALL_MERGE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["merge"].toUpperCase()
+                        text = messages.getString("merge").toUpperCase()
                         action {
-                            chooseDirectory(messages["choose_output_folder"])?.let {
+                            chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.merge(it)
                             }
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.selectedCount.gt(0))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.selectedCount.gt(0))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.DELETE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["remove"].toUpperCase()
+                        text = messages.getString("remove").toUpperCase()
                         action {
                             viewModel.deleteSelected()
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.hasSegments.and(viewModel.selectedCount.eq(0)))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.hasSegments.and(viewModel.selectedCount.eq(0)))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.ADD, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["add"].toUpperCase()
+                        text = messages.getString("add").toUpperCase()
                         isDisableVisualFocus = true
                         action {
                             chooseAndImportWav()
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.hasSegments.and(viewModel.selectedCount.eq(0)))
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.hasSegments.and(viewModel.selectedCount.eq(0)))
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CLEAR_ALL, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["clear_all"].toUpperCase()
+                        text = messages.getString("clear_all").toUpperCase()
                         isDisableVisualFocus = true
                         action {
                             viewModel.reset()
                         }
                     })
                     add(JFXButton().apply {
-                        visibleProperty().bind(viewModel.hasSegments)
-                        managedProperty().bind(visibleProperty())
+                        visibleWhen(viewModel.hasSegments)
+                        managedWhen(visibleProperty())
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.SELECT_ALL, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages["select_all"].toUpperCase()
+                        text = messages.getString("select_all").toUpperCase()
                         isDisableVisualFocus = true
                         action {
                             viewModel.selectAll()
@@ -191,10 +191,10 @@ class MainView : View() {
             stackpane {
                 vgrow = Priority.ALWAYS
                 vbox {
-                    visibleProperty().bind(viewModel.hasSegments.not())
+                    hiddenWhen(viewModel.hasSegments)
                     addClass(MainViewStyles.bigDragTarget)
                     add(MaterialIconView(MaterialIcon.ADD, "2em"))
-                    label(messages["drop_here"])
+                    label(messages.getString("drop_here"))
                     setOnMouseClicked {
                         chooseAndImportWav()
                     }
@@ -217,8 +217,8 @@ class MainView : View() {
                     }
                 }
                 listview(viewModel.segments) {
-                    visibleProperty().bind(viewModel.hasSegments)
-                    managedProperty().bind(visibleProperty())
+                    visibleWhen(viewModel.hasSegments)
+                    managedWhen(visibleProperty())
                     addClass(MainViewStyles.segmentList)
                     cellCache { segment ->
                         hbox {
@@ -283,7 +283,7 @@ class MainView : View() {
 
     fun chooseAndImportWav() {
         val wavFiles = chooseFile(
-            messages["choose_wav_file"],
+            messages.getString("choose_wav_file"),
             arrayOf(FileChooser.ExtensionFilter("WAV File", "*.wav")),
             FileChooserMode.Single
         )
