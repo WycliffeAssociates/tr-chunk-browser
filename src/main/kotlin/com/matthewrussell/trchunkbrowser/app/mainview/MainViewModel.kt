@@ -1,11 +1,9 @@
 package com.matthewrussell.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.observeOnFx
-import com.matthewrussell.trchunkbrowser.domain.ConvertDirectory
-import com.matthewrussell.trchunkbrowser.domain.ExportSegments
-import com.matthewrussell.trchunkbrowser.domain.GetWavSegments
-import com.matthewrussell.trchunkbrowser.domain.sortedByLabel
+import com.matthewrussell.trchunkbrowser.domain.*
 import com.matthewrussell.trchunkbrowser.model.AudioSegment
+import com.matthewrussell.trchunkbrowser.model.Language
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -14,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import tornadofx.*
 import java.io.File
+import java.util.*
 
 class MainViewModel : ViewModel() {
     val segments = FXCollections.observableArrayList<AudioSegment>()
@@ -27,19 +26,23 @@ class MainViewModel : ViewModel() {
     val snackBarProgress = PublishSubject.create<Int>()
     val confirmConvertDirectory = PublishSubject.create<File>()
 
+    private var langsShown: Boolean by property(false)
+    val langsShownProperty = getProperty(MainViewModel::langsShown)
+
+    var languages = FXCollections.observableArrayList<Language>(I18N.availableLanguages)
+
     fun importFile(file: File) {
         if (file.isDirectory) {
             confirmConvertDirectory.onNext(file)
-//            convertDirectory(file)
             return
         }
         if (file.extension.toLowerCase() != "wav") {
-            snackBarMessages.onNext(messages.getString("not_wav_file"))
+            snackBarMessages.onNext(I18N.get("not_wav_file"))
             return
         }
 
         if (segments.map { it.src.name }.contains(file.name)) {
-            snackBarMessages.onNext(messages.getString("file_already_imported"))
+            snackBarMessages.onNext(I18N.get("file_already_imported"))
             return
         }
 
@@ -49,7 +52,7 @@ class MainViewModel : ViewModel() {
             .observeOnFx()
             .onErrorReturn {
                 println(it)
-                snackBarMessages.onNext(messages.getString("import_error"))
+                snackBarMessages.onNext(I18N.get("import_error"))
                 listOf()
             }
             .doOnSuccess { retrieved ->
@@ -67,11 +70,11 @@ class MainViewModel : ViewModel() {
             }
             .doOnComplete {
                 snackBarProgress.onNext(100)
-                snackBarMessages.onNext(messages.getString("done_exporting"))
+                snackBarMessages.onNext(I18N.get("done_exporting"))
             }
             .onErrorResumeNext {
                 Completable.fromAction {
-                    snackBarMessages.onNext(messages.getString("export_error"))
+                    snackBarMessages.onNext(I18N.get("export_error"))
                 }
             }
             .subscribeOn(Schedulers.io())
@@ -83,7 +86,7 @@ class MainViewModel : ViewModel() {
             .exportSeparate(outputDir)
             .observeOnFx()
             .subscribe {
-                snackBarMessages.onNext(messages.getString("done_exporting"))
+                snackBarMessages.onNext(I18N.get("done_exporting"))
             }
         clearSelected()
     }
@@ -94,9 +97,9 @@ class MainViewModel : ViewModel() {
             .observeOnFx()
             .subscribe { result ->
                 if (result == ExportSegments.MergeResult.SUCCESS) {
-                    snackBarMessages.onNext(messages.getString("done_exporting"))
+                    snackBarMessages.onNext(I18N.get("done_exporting"))
                 } else {
-                    snackBarMessages.onNext(messages.getString("export_error"))
+                    snackBarMessages.onNext(I18N.get("export_error"))
                 }
             }
         clearSelected()
@@ -127,5 +130,14 @@ class MainViewModel : ViewModel() {
 
     fun reset() {
         segments.clear()
+    }
+
+    fun toggleLangsShown() {
+        langsShown = !langsShown;
+    }
+
+    fun changeLanguage(lang: String) {
+        I18N.setLocale(Locale(lang))
+        toggleLangsShown()
     }
 }

@@ -16,7 +16,7 @@ fun ObservableList<AudioSegment>.sortedByLabel(): ObservableList<AudioSegment> {
 
             return@sorted o1Num - o2Num
         } else {
-            return@sorted o1.label?.compareTo(o2.label)
+            return@sorted o1.label.compareTo(o2.label)
         }
     }
 }
