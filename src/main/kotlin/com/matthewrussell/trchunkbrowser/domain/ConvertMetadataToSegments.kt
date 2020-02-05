@@ -9,11 +9,10 @@ class ConvertMetadataToSegments(private val metadata: Metadata, private val src:
         val segments: MutableList<AudioSegment> = mutableListOf()
         for (i in 0 until metadata.markers.size) {
             val segment = AudioSegment(
-                metadata.markers[i].id,
                 src,
-                metadata.markers[i].position / 44100.0,
+                metadata.markers[i].location / 44100.0,
                 if (i < metadata.markers.size - 1) {
-                    metadata.markers[i+1].position / 44100.0
+                    metadata.markers[i+1].location / 44100.0
                 } else {
                     duration
                 },

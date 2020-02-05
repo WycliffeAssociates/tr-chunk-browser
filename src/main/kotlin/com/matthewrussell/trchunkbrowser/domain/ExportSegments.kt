@@ -27,7 +27,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         val file = if (cache.containsKey(source)) {
             cache[source]!!
         } else {
-            cache[source] = WavFileReader().read(source)
+            cache[source] = WavFileReader(source).read()
             cache[source]!!
         }
 
@@ -39,15 +39,15 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             .map { file.metadata.markers.indexOf(it) }
             .first()
 
-        val startAudioIndex = file.metadata.markers[markerIndex].position * BITS_PER_SAMPLE / 8
+        val startAudioIndex = file.metadata.markers[markerIndex].location * BITS_PER_SAMPLE / 8
         val endAudioIndex = if (markerIndex < file.metadata.markers.size - 1) {
-            file.metadata.markers[markerIndex + 1].position * BITS_PER_SAMPLE / 8
+            file.metadata.markers[markerIndex + 1].location * BITS_PER_SAMPLE / 8
         } else {
             file.audio.size
         }
         val audioData = file.audio.copyOfRange(startAudioIndex, endAudioIndex)
         // Create the output wav file
-        val marker = file.metadata.markers[markerIndex].copy(position = 0)
+        val marker = file.metadata.markers[markerIndex].copy(location = 0)
         val metadata = file.metadata.copy(markers = mutableListOf(marker))
         metadata.startv = segment.label
         metadata.endv = segment.label
@@ -74,7 +74,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             val outputFiles = segments.map { makeWavFile(it) }
             val metadata = outputFiles.first().metadata
             metadata.markers = outputFiles.map { Pair(it.metadata.markers, it.audio.size / (BITS_PER_SAMPLE / 8)) }.reduce { acc, pair ->
-                pair.first.forEach { it.position += acc.second }
+                pair.first.forEach { it.location += acc.second }
                 Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
             }.first
             metadata.mode = MODE_CHUNK

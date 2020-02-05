@@ -8,6 +8,6 @@ import java.io.File
 class GetWavMetadata(private val wavFile: File) {
     fun metadata(): Single<Metadata> = Single
         .fromCallable {
-            WavFileReader().readMetadata(wavFile)
+            WavFileReader(wavFile).readMetadata()
         }
 }

@@ -23,6 +23,9 @@ class MainViewStyles : Stylesheet() {
         val jfxSnackbarContent by cssclass()
         val jfxSnackbarToast by cssclass()
         val jfxSnackbarAction by cssclass()
+        val languagesList by cssclass()
+        val languagesListItems by cssclass()
+        val languageItem by cssclass()
 
         val bgColor = c("#ffffff")
         val primaryColor = c("#FF6C6C")
@@ -30,12 +33,12 @@ class MainViewStyles : Stylesheet() {
         val shadowColor = c("d6d6d6")
         val faintBorderColor = c("#ccc")
         val snackbarColor = c("#2d2d2d")
-        val columnWidth = 500.px
+        val columnWidth = 700.px
     }
     init {
         root {
             prefHeight = 500.px
-            prefWidth = 700.px
+            prefWidth = 1000.px
             backgroundColor += bgColor
             fontFamily = "Avenir"
             fontSize = 20.px
@@ -97,6 +100,30 @@ class MainViewStyles : Stylesheet() {
                 }
                 scrollBar {
 
+                }
+            }
+            languagesList {
+                backgroundColor += Color.TRANSPARENT
+                alignment = Pos.TOP_RIGHT
+
+                languagesListItems {
+                    maxWidth = 200.px
+                    alignment = Pos.TOP_LEFT
+                    backgroundColor += primaryColor
+                    effect = DropShadow(6.0, 0.0, 3.0, shadowColor)
+
+                    listCell {
+                        backgroundColor += Color.TRANSPARENT
+                    }
+
+                    languageItem {
+                        label {
+                            fontWeight = FontWeight.BOLD
+                            textFill = Color.WHITE
+                        }
+                        fill = textColor
+                        cursor = Cursor.HAND
+                    }
                 }
             }
             bigDragTarget {
