@@ -14,6 +14,7 @@ object Properties {
         val configs = Configurations()
         val propertiesFile = File("config.properties")
 
+        // Create empty properties file if it doesn't exist
         if(!propertiesFile.exists()) {
             val os = FileOutputStream(propertiesFile)
             os.write("".toByteArray())

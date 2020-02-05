@@ -111,7 +111,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.SHARE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("export")
+                        text = messages.getString("export").toUpperCase()
                         action {
                             chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.split(it)
@@ -124,7 +124,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CALL_SPLIT, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("split")
+                        text = messages.getString("split").toUpperCase()
                         action {
                             chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.split(it)
@@ -137,7 +137,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CALL_MERGE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("merge")
+                        text = messages.getString("merge").toUpperCase()
                         action {
                             chooseDirectory(messages.getString("choose_output_folder"))?.let {
                                 viewModel.merge(it)
@@ -150,7 +150,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.DELETE, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("remove")
+                        text = messages.getString("remove").toUpperCase()
                         action {
                             viewModel.deleteSelected()
                         }
@@ -162,7 +162,7 @@ class MainView : View() {
                         graphic = MaterialIconView(MaterialIcon.ADD, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
                         isDisableVisualFocus = true
-                        text = messages.getString("add")
+                        text = messages.getString("add").toUpperCase()
                         action {
                             chooseAndImportWav()
                         }
@@ -173,7 +173,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.CLEAR_ALL, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("clear_all")
+                        text = messages.getString("clear_all").toUpperCase()
                         isDisableVisualFocus = true
                         action {
                             viewModel.reset()
@@ -185,7 +185,7 @@ class MainView : View() {
                         addClass(MainViewStyles.actionBarButton)
                         graphic = MaterialIconView(MaterialIcon.SELECT_ALL, "1.5em")
                         graphic?.addClass(MainViewStyles.actionBarIcon)
-                        text = messages.getString("select_all")
+                        text = messages.getString("select_all").toUpperCase()
                         isDisableVisualFocus = true
                         action {
                             viewModel.selectAll()
