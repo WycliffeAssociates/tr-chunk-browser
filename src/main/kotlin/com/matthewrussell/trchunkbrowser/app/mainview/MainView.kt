@@ -1,10 +1,7 @@
 package com.matthewrussell.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.toObservable
-import com.jfoenix.controls.JFXButton
-import com.jfoenix.controls.JFXCheckBox
-import com.jfoenix.controls.JFXDialog
-import com.jfoenix.controls.JFXSnackbar
+import com.jfoenix.controls.*
 import com.matthewrussell.trchunkbrowser.app.controls.materialdialog.MaterialDialogContent
 import com.matthewrussell.trchunkbrowser.domain.Properties
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
@@ -13,6 +10,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
+import javafx.util.Duration
 import tornadofx.*
 import java.util.*
 import kotlin.math.floor
@@ -34,11 +32,8 @@ class MainView : View() {
                 viewModel.snackBarProgress.subscribe { progress ->
                     if(progress < 100) {
                         enqueue(JFXSnackbar.SnackbarEvent(
-                            messages.getString("export_in_progress"),
-                            "",
-                            0,
-                            true,
-                            null
+                            JFXSnackbarLayout(messages.getString("export_in_progress")),
+                            Duration.INDEFINITE
                         ))
                     } else {
                         this.visibleProperty()
@@ -52,11 +47,12 @@ class MainView : View() {
             add(JFXSnackbar(this).apply { // Messages snackbar
                 viewModel.snackBarMessages.subscribe { message ->
                     enqueue(JFXSnackbar.SnackbarEvent(
-                        message,
-                        messages.getString("ok"),
-                        0,
-                        true,
-                        EventHandler { this.close() }
+                        JFXSnackbarLayout(
+                            message,
+                            messages.getString("ok"),
+                            EventHandler { this.close() }
+                        ),
+                        Duration.INDEFINITE
                     ))
                 }
             })

@@ -1,6 +1,6 @@
 language: kotlin
 jdk:
-- oraclejdk8
+- openjdk11
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -17,5 +17,5 @@ deploy:
   file: build/libs/tr-chunk-browser.jar
   skip_cleanup: true
   on:
-    repo: mbr4477/tr-chunk-browser
+    repo: WycliffeAssociates/tr-chunk-browser
     tags: true
