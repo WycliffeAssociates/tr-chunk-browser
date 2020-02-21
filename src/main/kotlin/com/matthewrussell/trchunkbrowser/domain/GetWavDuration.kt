@@ -7,6 +7,6 @@ import java.io.File
 class GetWavDuration(private val wavFile: File) {
     fun duration(): Single<Double> = Single
         .fromCallable {
-            WavFileReader().duration(wavFile)
+            WavFileReader(wavFile).duration()
         }
 }
