@@ -12,9 +12,7 @@ data class AudioSegment(
     val sourceMetadata: Metadata
 ): Comparable<AudioSegment> {
     override fun compareTo(other: AudioSegment): Int {
-        // Sort Audio Segments by Begin first then by Label
-
-        val beginComparator: Comparator<AudioSegment> = Comparator.comparing(AudioSegment::begin)
+        // Sort Audio Segments by Label first then by Begin
 
         val labelComparator: Comparator<AudioSegment> = Comparator { o1, o2 ->
             val pattern = Pattern.compile("\\d+")
@@ -43,7 +41,9 @@ data class AudioSegment(
             }
         }
 
-        return beginComparator.thenComparing(labelComparator).compare(this, other)
+        val beginComparator: Comparator<AudioSegment> = Comparator.comparing(AudioSegment::begin)
+
+        return labelComparator.thenComparing(beginComparator).compare(this, other)
     }
 
 }

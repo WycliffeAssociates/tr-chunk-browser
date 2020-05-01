@@ -7,6 +7,7 @@ import java.io.File
 class ConvertMetadataToSegments(private val metadata: Metadata, private val src: File, private val duration: Double) {
     fun segments(): List<AudioSegment> {
         val segments: MutableList<AudioSegment> = mutableListOf()
+        metadata.markers = metadata.markers.sortedBy { it.location }.toMutableList()
         for (i in 0 until metadata.markers.size) {
             val segment = AudioSegment(
                 src,
