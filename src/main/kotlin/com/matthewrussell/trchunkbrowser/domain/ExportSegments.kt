@@ -31,6 +31,9 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             cache[source]!!
         }
 
+        // Sort markers
+        file.metadata.markers = file.metadata.markers.sortedBy { it.location }.toMutableList()
+
         // Find the marker
         val markerIndex = file
             .metadata
@@ -51,7 +54,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         val metadata = file.metadata.copy(markers = mutableListOf(marker))
         metadata.startv = segment.label
         metadata.endv = segment.label
-        return  WavFile(metadata, audioData)
+        return WavFile(metadata, audioData)
     }
 
     fun exportSeparate(outputDir: File): Completable {
@@ -73,10 +76,11 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         return Single.fromCallable {
             val outputFiles = segments.map { makeWavFile(it) }
             val metadata = outputFiles.first().metadata
-            metadata.markers = outputFiles.map { Pair(it.metadata.markers, it.audio.size / (BITS_PER_SAMPLE / 8)) }.reduce { acc, pair ->
-                pair.first.forEach { it.location += acc.second }
-                Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
-            }.first
+            metadata.markers = outputFiles.map { Pair(it.metadata.markers, it.audio.size / (BITS_PER_SAMPLE / 8)) }
+                .reduce { acc, pair ->
+                    pair.first.forEach { it.location += acc.second }
+                    Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
+                }.first
             metadata.mode = MODE_CHUNK
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
