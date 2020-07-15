@@ -66,3 +66,5 @@ fabric.properties
 
 .gradle/
 build/
+
+config.properties

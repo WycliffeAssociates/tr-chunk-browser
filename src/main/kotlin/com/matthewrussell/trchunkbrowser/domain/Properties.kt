@@ -4,7 +4,6 @@ import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import java.io.File
-import java.io.FileOutputStream
 
 object Properties {
     val builder: FileBasedConfigurationBuilder<PropertiesConfiguration>
