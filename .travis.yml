@@ -16,7 +16,7 @@ script:
 - cp ./build/libs/tr-chunk-browser.jar  ./jar2app/tr-chunk-browser.jar
 - cp jar2appvars.env ./jar2app/vars.env
 - cd jar2app && ./build.sh && cd ..
-- APPFILE=$(find ./Jar2AppImage -name 'tr-chunk-browser*.AppImage'  | tr -t "\n" "")
+- export APPFILE=$(find ./Jar2AppImage -name 'tr-chunk-browser*.AppImage'  | tr -t "\n" "")
 - mkdir out
 - cp $APPFILE ./out
 addons:
