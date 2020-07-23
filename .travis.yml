@@ -10,11 +10,30 @@ cache:
   - "$HOME/.gradle/wrapper/"
 script:
 - "./gradlew build"
+- URL=$(curl 'https://api.github.com/repos/WycliffeAssociates/Jar2AppImage/releases?per_page=1' | jq -r '.[] | .zipball_url')
+- curl -L $URL --output jar2app.zip
+- unzip -j jar2app.zip -d jar2app
+- cp ./build/libs/tr-chunk-browser.jar  ./jar2app/tr-chunk-browser.jar
+- cp jar2appvars.env ./jar2app/vars.env
+- cd jar2app && ./build.sh && cd ..
+- APPFILE=$(find ./Jar2AppImage -name 'tr-chunk-browser*.AppImage'  | tr -t "\n" "")
+- mkdir out
+- cp $APPFILE ./out
+addons:
+  artifacts:
+    s3_region: us-east-1
+    working_dir: out
+    target_paths:
+    - "/${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}/${TRAVIS_BUILD_NUMBER}/${TRAVIS_TAG}"
+    paths:
+    - $(find . -name 'tr-chunk-browser*.AppImage'  | tr "\n" ":")
 deploy:
   provider: releases
   api_key:
     secure: WqEyylwpkTIyu4YANkGyCILSfHmPbAaMDQOIIUAS32/uPCoK0VS9EDrnmBLtZrAb7ejZxJRsXzpk67fi9LWSIdbtIZcIOr5gt9KiqY80tGEGFJ+J9NODbMepuL2u/GouyeUYwdfEx8ofLgxqIl9TnXx5rT66/fxJQIQLvR8YQpvb1jj3rAcOBd29DYClJRxNhsDxbyztBK68JauA6H2RJzhqe4Tr9X2rYQtwTGHjxTSYJXI/DLzdPsstlXOldmPlx+RxoyLfXcY4m2cLeXTA/a5JkZxf5AriH7U6nrFUJJrepw1aEmJn/ULwoJaEhHcOQsvKtRqI3I2pExg3mY7QlwQdvEaEnuEPYOkZ2ljTuGNnqNNVFfytVselIHM0O4QPyOoX7ETM01Ly//iCZ45zwBvTF/cySv/abez0hCwpABCEZnLQZiSVTbJ+Lg+kjWhQ35tJwMHARjQxTV8INeSmdQgjGE5YfgBa9y/qff4KMOhIzodEp15J2dxIS8q30fY9tc9Ql5Zu6FfqnjqxHYRN0h7KGCIVS5KiALYcy7fjZTg4xSRF4SiEi+7HC5JwDRwdycwRoU5JMDzVF0+dKQr3sO4C5ND7dAlQxJWZmq4lXPrpV9dRBrIJQ/2l94SUBZybTmwnlId4rnG5c5mzHOcTBQpCibnkuMvb3gp6iMun8pQ=
-  file: build/libs/tr-chunk-browser.jar
+  file:
+  - build/libs/tr-chunk-browser.jar
+  - $(ls ./out/tr-chunk-browser*.AppImage)
   skip_cleanup: true
   on:
     repo: WycliffeAssociates/tr-chunk-browser
