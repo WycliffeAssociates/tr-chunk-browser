@@ -1,0 +1,8 @@
+dependencies {
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVer"
+    implementation "com.github.thomasnield:rxkotlinfx:$rxkotlinfxVer"
+    implementation "com.github.WycliffeAssociates:tr-wav:$trWavVer"
+    implementation "org.apache.commons:commons-configuration2:$commonsConfig2Ver"
+
+    testImplementation group: 'junit', name: 'junit', version: "$junitVer"
+}

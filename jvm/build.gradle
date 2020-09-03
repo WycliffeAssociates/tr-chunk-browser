@@ -1,0 +1,74 @@
+plugins {
+    id "org.openjfx.javafxplugin" version "0.0.8"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'edu.sc.seis.launch4j'
+
+javafx {
+    version = '11'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+version = '0.2.0'
+
+application {
+    mainClassName = "com.matthewrussell.trchunkbrowser.app.MainKt"
+}
+
+dependencies {
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVer"
+    implementation "com.github.thomasnield:rxkotlinfx:$rxkotlinfxVer"
+    implementation "com.github.WycliffeAssociates:tr-wav:$trWavVer"
+    implementation "no.tornado:tornadofx:$tornadofxVer"
+    implementation "org.apache.commons:commons-configuration2:$commonsConfig2Ver"
+    implementation "commons-beanutils:commons-beanutils:$commonsBeanUtilsVer"
+
+    //OpenJFX cross-platform fat jar dependencies
+    runtimeOnly "org.openjfx:javafx-graphics:$javafxPluginVer:win"
+    runtimeOnly "org.openjfx:javafx-graphics:$javafxPluginVer:linux"
+    runtimeOnly "org.openjfx:javafx-graphics:$javafxPluginVer:mac"
+
+    //FontAwesomeFX
+    implementation "de.jensd:fontawesomefx-commons:$fontAwesomeVer"
+    implementation "de.jensd:fontawesomefx-materialicons:$fontAwesomeMaterialIconsVer"
+    implementation "com.jfoenix:jfoenix:$jfoenixVer"
+
+    implementation project(':common')
+
+    testImplementation group: 'junit', name: 'junit', version: "$junitVer"
+}
+
+// tell gradle what to put in the jar
+shadowJar {
+    archiveFileName = "${rootProject.name}.jar"
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': "com.matthewrussell.trchunkbrowser.app.MainKt"
+        )
+    }
+}
+
+task copyJre(type: Copy) {
+    if (project.hasProperty("jrePath")) {
+        from jrePath
+        into "${buildDir}/launch4j/jre"
+    }
+}
+
+launch4j {
+    outfile = "${rootProject.name}.exe"
+    mainClassName = project.mainClassName
+    bundledJrePath = "jre"
+    bundledJre64Bit = true
+    jdkPreference = 'jdkOnly'
+    icon = "${projectDir}/launcher.ico"
+    jar = "${buildDir}/libs/${rootProject.name}.jar"
+    productName = rootProject.name
+}
+
+project.tasks.createExe.dependsOn copyJre
+project.tasks.createExe.dependsOn shadowJar
