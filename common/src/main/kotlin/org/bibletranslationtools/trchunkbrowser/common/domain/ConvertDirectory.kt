@@ -3,15 +3,15 @@ package org.bibletranslationtools.trchunkbrowser.common.domain
 import io.reactivex.Completable
 import java.io.File
 
-class ConvertDirectory(private val inputDir: File) {
+class ConvertDirectory(private val inputDir: File, private val outputDir: File? = null) {
     fun convert(rootDir: File = inputDir.parentFile): Completable {
-        val outputDir = rootDir.resolve("${inputDir.name}-out")
+        val outDir = outputDir ?: rootDir.resolve("${inputDir.name}-out")
         return Completable
             .fromAction {
-                convertDirectory(inputDir, outputDir)
+                convertDirectory(inputDir, outDir)
             }
             .doOnError {
-                outputDir.deleteRecursively()
+                outDir.deleteRecursively()
             }
     }
 
