@@ -1,7 +1,7 @@
 package org.bibletranslationtools.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.observeOnFx
-import org.bibletranslationtools.trchunkbrowser.common.domain.ConvertDirectory
+import org.bibletranslationtools.trchunkbrowser.common.domain.DirectorySplit
 import org.bibletranslationtools.trchunkbrowser.common.domain.ExportSegments
 import org.bibletranslationtools.trchunkbrowser.common.domain.GetWavSegments
 import org.bibletranslationtools.trchunkbrowser.common.domain.Properties
@@ -72,8 +72,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun convertDirectory(dir: File) {
-        ConvertDirectory(dir)
-            .convert()
+        DirectorySplit(dir)
+            .split()
             .doOnSubscribe {
                 snackBarProgress.onNext(0)
             }
