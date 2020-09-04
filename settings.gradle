@@ -1,1 +1,3 @@
 rootProject.name = 'tr-chunk-browser'
+
+include ':common', ':jvm', ':cli'

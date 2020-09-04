@@ -1,0 +1,43 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'edu.sc.seis.launch4j'
+
+version = '0.1.0'
+
+application {
+    mainClassName = "org.bibletranslationtools.cli.Main"
+}
+
+repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVer"
+    implementation "com.github.thomasnield:rxkotlinfx:$rxkotlinfxVer"
+    implementation "info.picocli:picocli:4.5.1"
+    kapt "info.picocli:picocli-codegen:4.5.1"
+
+    implementation project(':common')
+}
+
+kapt {
+    arguments {
+        arg("project", "${project.group}/${project.name}")
+    }
+}
+
+// tell gradle what to put in the jar
+shadowJar {
+    archiveFileName = "${rootProject.name}_${project.name}.jar"
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': "org.bibletranslationtools.cli.Main"
+        )
+    }
+}
