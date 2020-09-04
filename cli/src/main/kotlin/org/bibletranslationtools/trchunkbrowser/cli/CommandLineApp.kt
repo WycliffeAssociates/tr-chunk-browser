@@ -19,7 +19,7 @@ class CommandLineApp() : Runnable {
     @Option(names = ["-f", "--files"], description = ["One or more input files"], arity = "1..*")
     private val files: List<File> = listOf()
 
-    @Option(names = ["-d", "--dir"], description = ["Input directory to split all the files in it"])
+    @Option(names = ["-d", "--dir"], description = ["Input directory to split files in place, recursively"])
     private val inputDir: File? = null
 
     @Option(
