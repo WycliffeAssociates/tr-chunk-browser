@@ -1,6 +1,6 @@
 package org.bibletranslationtools.trchunkbrowser.cli
 
-import org.bibletranslationtools.trchunkbrowser.common.domain.ConvertDirectory
+import org.bibletranslationtools.trchunkbrowser.common.domain.DirectorySplit
 import org.bibletranslationtools.trchunkbrowser.common.domain.ExportSegments
 import org.bibletranslationtools.trchunkbrowser.common.domain.GetWavSegments
 import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
@@ -31,9 +31,9 @@ class CommandLineController {
             }
     }
 
-    fun convertDirectory(inputDir: File, outputDir: File? = null) {
-        ConvertDirectory(inputDir, outputDir)
-            .convert()
+    fun splitDirectory(inputDir: File, outputDir: File? = null) {
+        DirectorySplit(inputDir, outputDir)
+            .split()
             .doOnComplete {
                 logger.log(Level.INFO, "Export complete")
             }

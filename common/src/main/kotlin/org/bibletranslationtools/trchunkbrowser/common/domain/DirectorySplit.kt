@@ -3,23 +3,23 @@ package org.bibletranslationtools.trchunkbrowser.common.domain
 import io.reactivex.Completable
 import java.io.File
 
-class ConvertDirectory(private val inputDir: File, private val outputDir: File? = null) {
-    fun convert(rootDir: File = inputDir.parentFile): Completable {
+class DirectorySplit(private val inputDir: File, private val outputDir: File? = null) {
+    fun split(rootDir: File = inputDir.parentFile): Completable {
         val outDir = outputDir ?: rootDir.resolve("${inputDir.name}-out")
         return Completable
             .fromAction {
-                convertDirectory(inputDir, outDir)
+                splitDirectory(inputDir, outDir)
             }
             .doOnError {
                 outDir.deleteRecursively()
             }
     }
 
-    private fun convertDirectory(inputDir: File, outputDir: File) {
+    private fun splitDirectory(inputDir: File, outputDir: File) {
         inputDir.listFiles()?.let {
             for (file in it.toList()) {
                 if (file.isDirectory) {
-                    convertDirectory(file, File(outputDir, file.name))
+                    splitDirectory(file, File(outputDir, file.name))
                 }
                 else {
                     // Skip non-wav files and files without verse information
@@ -38,14 +38,14 @@ class ConvertDirectory(private val inputDir: File, private val outputDir: File? 
                     }
 
                     if((file.extension.toLowerCase() == "wav") && !shouldSkip) {
-                        convertFile(file, outputDir)
+                        splitFile(file, outputDir)
                     }
                 }
             }
         }
     }
 
-    private fun convertFile(wav: File, outputDir: File) {
+    private fun splitFile(wav: File, outputDir: File) {
         ExportSegments(GetWavSegments(wav).segments().blockingGet())
             .exportSeparate(outputDir)
             .blockingAwait()

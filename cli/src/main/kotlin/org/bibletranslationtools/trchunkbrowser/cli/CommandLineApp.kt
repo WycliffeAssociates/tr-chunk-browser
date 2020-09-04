@@ -38,7 +38,7 @@ class CommandLineApp() : Runnable {
     private fun execute() {
         when {
             inputDir != null -> {
-                controller.convertDirectory(inputDir, outputDir)
+                controller.splitDirectory(inputDir, outputDir)
             }
             split -> {
                 outputDir?.let {
