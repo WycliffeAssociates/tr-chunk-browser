@@ -15,7 +15,7 @@ javafx {
 version = '0.2.0'
 
 application {
-    mainClassName = "com.matthewrussell.trchunkbrowser.app.MainKt"
+    mainClassName = "org.bibletranslationtools.trchunkbrowser.app.MainKt"
 }
 
 dependencies {
@@ -47,7 +47,7 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-                'Main-Class': "com.matthewrussell.trchunkbrowser.app.MainKt"
+                'Main-Class': "org.bibletranslationtools.trchunkbrowser.app.MainKt"
         )
     }
 }
