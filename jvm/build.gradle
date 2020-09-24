@@ -12,7 +12,7 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
-version = '0.2.0'
+version = '0.2.1'
 
 application {
     mainClassName = "org.bibletranslationtools.trchunkbrowser.app.MainKt"
@@ -60,12 +60,13 @@ task copyJre(type: Copy) {
 }
 
 launch4j {
+    println(projectDir)
     outfile = "${rootProject.name}.exe"
     mainClassName = project.mainClassName
     bundledJrePath = "jre"
     bundledJre64Bit = true
     jdkPreference = 'jdkOnly'
-    icon = "${projectDir}/launcher.ico"
+    icon = "${rootProject.projectDir}/launcher.ico"
     jar = "${buildDir}/libs/${rootProject.name}.jar"
     productName = rootProject.name
 }

@@ -37,7 +37,8 @@ class MainViewModel : ViewModel() {
 
     var languages = FXCollections.observableArrayList<Language>(
         Language("en", "English"),
-        Language("ru", "Русский")
+        Language("ru", "Русский"),
+        Language("vi", "Tiếng Việt")
     )
 
     fun importFile(file: File) {
