@@ -26,8 +26,7 @@ class CommandLineController {
                 importFile(it).toObservable()
             }
             .onErrorReturn {
-                logger.log(Level.WARNING, "Couldn't import files: ${it.message}")
-                logger.log(Level.WARNING, it.message)
+                logger.log(Level.WARNING, "Couldn't import files. ${it.message}")
                 listOf()
             }
             .blockingSubscribe {

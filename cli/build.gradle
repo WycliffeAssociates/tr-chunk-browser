@@ -33,7 +33,7 @@ kapt {
 
 // tell gradle what to put in the jar
 shadowJar {
-    archiveFileName = "${rootProject.name}_${project.name}.jar"
+    archiveFileName = "${rootProject.name}-${project.name}.jar"
     mergeServiceFiles()
     manifest {
         attributes(
