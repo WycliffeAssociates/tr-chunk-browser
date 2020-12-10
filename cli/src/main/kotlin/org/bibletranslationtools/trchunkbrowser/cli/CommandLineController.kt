@@ -25,6 +25,11 @@ class CommandLineController {
             .concatMap {
                 importFile(it).toObservable()
             }
+            .onErrorReturn {
+                logger.log(Level.WARNING, "Couldn't import files: ${it.message}")
+                logger.log(Level.WARNING, it.message)
+                listOf()
+            }
             .blockingSubscribe {
                 segments.addAll(it)
                 segments.sort()

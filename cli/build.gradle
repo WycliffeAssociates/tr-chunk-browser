@@ -9,7 +9,7 @@ apply plugin: 'edu.sc.seis.launch4j'
 version = '0.1.0'
 
 application {
-    mainClassName = "org.bibletranslationtools.cli.Main"
+    mainClassName = "org.bibletranslationtools.trchunkbrowser.cli.Main"
 }
 
 repositories {
@@ -37,7 +37,7 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-                'Main-Class': "org.bibletranslationtools.cli.Main"
+                'Main-Class': "org.bibletranslationtools.trchunkbrowser.cli.Main"
         )
     }
 }
