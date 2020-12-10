@@ -9,7 +9,7 @@ apply plugin: 'edu.sc.seis.launch4j'
 version = '0.1.0'
 
 application {
-    mainClassName = "org.bibletranslationtools.cli.Main"
+    mainClassName = "org.bibletranslationtools.trchunkbrowser.cli.Main"
 }
 
 repositories {
@@ -33,11 +33,11 @@ kapt {
 
 // tell gradle what to put in the jar
 shadowJar {
-    archiveFileName = "${rootProject.name}_${project.name}.jar"
+    archiveFileName = "${rootProject.name}-${project.name}.jar"
     mergeServiceFiles()
     manifest {
         attributes(
-                'Main-Class': "org.bibletranslationtools.cli.Main"
+                'Main-Class': "org.bibletranslationtools.trchunkbrowser.cli.Main"
         )
     }
 }
