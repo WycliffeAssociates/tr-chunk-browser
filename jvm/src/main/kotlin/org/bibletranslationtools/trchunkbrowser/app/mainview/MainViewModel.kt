@@ -61,7 +61,6 @@ class MainViewModel : ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOnFx()
             .onErrorReturn {
-                println(it)
                 snackBarMessages.onNext(messages.getString("import_error"))
                 listOf()
             }
