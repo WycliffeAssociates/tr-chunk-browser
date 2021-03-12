@@ -12,7 +12,7 @@ ext {
     jfoenixVer = '9.0.8'
     junitVer = '4.12'
     launch4jVer = '2.4.6'
-    trWavVer = '0.3.1'
+    trWavVer = '0.3.2'
     commonsConfig2Ver = '2.6'
     commonsBeanUtilsVer = '1.9.3'
     fontAwesomeVer = '9.1.2'

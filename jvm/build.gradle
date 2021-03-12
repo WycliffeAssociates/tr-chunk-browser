@@ -12,7 +12,7 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
-version = '0.2.2'
+version = '0.2.3'
 
 application {
     mainClassName = "org.bibletranslationtools.trchunkbrowser.app.MainKt"
