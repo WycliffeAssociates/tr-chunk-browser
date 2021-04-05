@@ -85,6 +85,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
             val filename = generateFileName(segments.first().src, metadata)
+                .replace(Regex("_v.*\\."), ".") // chapter file name
             val wavFile = WavFile(metadata, audioData)
             WavFileWriter().write(wavFile, outputDir.resolve(filename))
             MergeResult.SUCCESS
