@@ -51,10 +51,10 @@ class CommandLineController {
 
     fun mergeDirectory(inputDir: File, outputDir: File) {
         inputDir.walk().filter { it.isDirectory }.forEach { dir ->
-            val audioFiles = dir.listFiles(File::isFile).toList()
+            val audioFiles = dir.listFiles(File::isFile)
             if (audioFiles.any()) {
                 segments.clear()
-                importFiles(audioFiles)
+                importFiles(audioFiles.toList())
                 merge(outputDir)
             }
         }
