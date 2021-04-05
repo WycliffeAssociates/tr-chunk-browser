@@ -37,9 +37,9 @@ class CommandLineApp() : Runnable {
 
     private fun execute() {
         when {
-            inputDir != null -> {
-                controller.splitDirectory(inputDir, outputDir)
-            }
+//            inputDir != null -> {
+//                controller.splitDirectory(inputDir, outputDir)
+//            }
             split -> {
                 outputDir?.let {
                     controller.importFiles(files)
@@ -50,8 +50,12 @@ class CommandLineApp() : Runnable {
             }
             merge -> {
                 outputDir?.let {
-                    controller.importFiles(files)
-                    controller.merge(outputDir)
+                    if (inputDir != null) {
+                        controller.mergeDirectory(inputDir, outputDir)
+                    } else {
+                        controller.importFiles(files)
+                        controller.merge(outputDir)
+                    }
                 } ?: run {
                     controller.logger.log(Level.SEVERE, "Output directory is not defined or does not exist")
                 }

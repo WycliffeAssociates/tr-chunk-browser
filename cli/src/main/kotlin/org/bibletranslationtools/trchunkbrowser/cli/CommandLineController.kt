@@ -49,6 +49,17 @@ class CommandLineController {
             .subscribe()
     }
 
+    fun mergeDirectory(inputDir: File, outputDir: File) {
+        inputDir.walk().filter { it.isDirectory }.forEach { dir ->
+            val audioFiles = dir.listFiles(File::isFile).toList()
+            if (audioFiles.any()) {
+                segments.clear()
+                importFiles(audioFiles)
+                merge(outputDir)
+            }
+        }
+    }
+
     fun split(outputDir: File) {
         ExportSegments(segments)
             .exportSeparate(outputDir)
