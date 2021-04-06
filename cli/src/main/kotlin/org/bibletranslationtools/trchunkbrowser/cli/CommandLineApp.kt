@@ -19,16 +19,12 @@ class CommandLineApp() : Runnable {
     @Option(names = ["-f", "--files"], description = ["One or more input files"], arity = "1..*")
     private val files: List<File> = listOf()
 
-    @Option(names = ["-d", "--dir"], description = ["Input directory to split files in place, recursively"])
+    @Option(names = ["-d", "--dir"], description = ["Input directory to split or merge files in place, recursively"])
     private val inputDir: File? = null
 
     @Option(
         names = ["-o", "--out"],
-        description = [
-            "Output directory to save result files to.",
-            "Required for split (-s) and merge (-m) actions.",
-            "Optional for dir split (-d)"
-        ]
+        description = ["Output directory to save result files to."]
     )
     private val outputDir: File? = null
 
@@ -37,13 +33,14 @@ class CommandLineApp() : Runnable {
 
     private fun execute() {
         when {
-//            inputDir != null -> {
-//                controller.splitDirectory(inputDir, outputDir)
-//            }
             split -> {
                 outputDir?.let {
-                    controller.importFiles(files)
-                    controller.split(outputDir)
+                    if (inputDir != null) {
+                        controller.splitDirectory(inputDir, outputDir)
+                    } else {
+                        controller.importFiles(files)
+                        controller.split(outputDir)
+                    }
                 } ?: run {
                     controller.logger.log(Level.SEVERE, "Output directory is not defined or does not exist")
                 }
