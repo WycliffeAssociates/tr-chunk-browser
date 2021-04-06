@@ -1,10 +1,6 @@
 package org.bibletranslationtools.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.observeOnFx
-import org.bibletranslationtools.trchunkbrowser.common.domain.DirectorySplit
-import org.bibletranslationtools.trchunkbrowser.common.domain.ExportSegments
-import org.bibletranslationtools.trchunkbrowser.common.domain.GetWavSegments
-import org.bibletranslationtools.trchunkbrowser.common.domain.Properties
 import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
 import org.bibletranslationtools.trchunkbrowser.common.model.Language
 import io.reactivex.Completable
@@ -13,6 +9,8 @@ import io.reactivex.subjects.PublishSubject
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import org.bibletranslationtools.trchunkbrowser.common.domain.*
 import tornadofx.ViewModel
 import tornadofx.getProperty
 import tornadofx.property
@@ -71,9 +69,27 @@ class MainViewModel : ViewModel() {
             .subscribe()
     }
 
-    fun convertDirectory(dir: File) {
+    fun splitDirectory(dir: File) {
         DirectorySplit(dir)
             .split()
+            .doOnSubscribe {
+                snackBarProgress.onNext(0)
+            }
+            .doOnComplete {
+                snackBarProgress.onNext(100)
+                snackBarMessages.onNext(messages.getString("done_exporting"))
+            }
+            .onErrorResumeNext {
+                Completable.fromAction {
+                    snackBarMessages.onNext(messages.getString("export_error"))
+                }
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
+    }
+
+    fun mergeDirectory(inputDir: File) {
+        DirectoryMerge().merge(inputDir)
             .doOnSubscribe {
                 snackBarProgress.onNext(0)
             }
@@ -102,6 +118,20 @@ class MainViewModel : ViewModel() {
 
     fun merge(outputDir: File) {
         ExportSegments(selectedSegments)
+            .exportMerged(outputDir)
+            .observeOnFx()
+            .subscribe { result ->
+                if (result == ExportSegments.MergeResult.SUCCESS) {
+                    snackBarMessages.onNext(messages.getString("done_exporting"))
+                } else {
+                    snackBarMessages.onNext(messages.getString("export_error"))
+                }
+            }
+        clearSelected()
+    }
+
+    fun merge(outputDir: File, segments: ObservableList<AudioSegment>) {
+        ExportSegments(segments)
             .exportMerged(outputDir)
             .observeOnFx()
             .subscribe { result ->
