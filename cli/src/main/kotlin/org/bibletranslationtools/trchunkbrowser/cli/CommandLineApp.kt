@@ -42,8 +42,12 @@ class CommandLineApp() : Runnable {
 //            }
             split -> {
                 outputDir?.let {
-                    controller.importFiles(files)
-                    controller.split(outputDir)
+                    if (inputDir != null) {
+                        controller.splitDirectory(inputDir, outputDir)
+                    } else {
+                        controller.importFiles(files)
+                        controller.split(outputDir)
+                    }
                 } ?: run {
                     controller.logger.log(Level.SEVERE, "Output directory is not defined or does not exist")
                 }
