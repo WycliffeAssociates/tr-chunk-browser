@@ -2,7 +2,6 @@ package org.bibletranslationtools.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.toObservable
 import com.jfoenix.controls.*
-import org.bibletranslationtools.trchunkbrowser.app.controls.materialdialog.MaterialDialogContent
 import de.jensd.fx.glyphs.materialicons.MaterialIcon
 import de.jensd.fx.glyphs.materialicons.MaterialIconView
 import javafx.event.EventHandler
@@ -10,6 +9,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import javafx.util.Duration
+import org.bibletranslationtools.trchunkbrowser.app.controls.materialdialog.MaterialDialogContent
 import org.bibletranslationtools.trchunkbrowser.common.domain.Properties
 import tornadofx.*
 import java.util.*
@@ -251,13 +251,13 @@ class MainView : View() {
 
                             label {
                                 addClass(MainViewStyles.segmentTitle)
-                                text = messages.getString(segment.sourceMetadata.slug) + " " +
-                                        "${segment.sourceMetadata.chapter.padStart(2, '0')}:" +
+                                text = messages.getString(segment.bttrFile.metadata.slug) + " " +
+                                        "${segment.bttrFile.metadata.chapter.padStart(2, '0')}:" +
                                         segment.label.padStart(2, '0')
                             }
 
                             val takeNum = "t\\d+$".toRegex()
-                                .find(segment.src.nameWithoutExtension)
+                                .find(segment.bttrFile.src.nameWithoutExtension)
                                 ?.value?.substring(1)
 
                             if(takeNum !== null) {

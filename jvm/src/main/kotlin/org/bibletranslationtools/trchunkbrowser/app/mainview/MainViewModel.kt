@@ -1,18 +1,18 @@
 package org.bibletranslationtools.trchunkbrowser.app.mainview
 
 import com.github.thomasnield.rxkotlinfx.observeOnFx
-import org.bibletranslationtools.trchunkbrowser.common.domain.DirectorySplit
+import io.reactivex.Completable
 import org.bibletranslationtools.trchunkbrowser.common.domain.ExportSegments
 import org.bibletranslationtools.trchunkbrowser.common.domain.GetWavSegments
 import org.bibletranslationtools.trchunkbrowser.common.domain.Properties
 import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
 import org.bibletranslationtools.trchunkbrowser.common.model.Language
-import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import org.bibletranslationtools.trchunkbrowser.common.domain.DirectorySplit
 import tornadofx.ViewModel
 import tornadofx.getProperty
 import tornadofx.property
@@ -51,7 +51,7 @@ class MainViewModel : ViewModel() {
             return
         }
 
-        if (segments.map { it.src.name }.contains(file.name)) {
+        if (segments.map { it.bttrFile.src.name }.contains(file.name)) {
             snackBarMessages.onNext(messages.getString("file_already_imported"))
             return
         }
