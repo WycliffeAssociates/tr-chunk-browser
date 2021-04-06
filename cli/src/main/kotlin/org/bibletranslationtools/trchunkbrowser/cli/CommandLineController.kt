@@ -7,6 +7,7 @@ import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toObservable
+import org.bibletranslationtools.trchunkbrowser.common.domain.DirectoryMerge
 import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -50,14 +51,16 @@ class CommandLineController {
     }
 
     fun mergeDirectory(inputDir: File, outputDir: File) {
-        inputDir.walk().filter { it.isDirectory }.forEach { dir ->
-            val audioFiles = dir.listFiles(File::isFile)
-            if (audioFiles.any()) {
-                segments.clear()
-                importFiles(audioFiles.toList())
-                merge(outputDir)
+        DirectoryMerge().merge(inputDir, outputDir)
+            .doOnComplete {
+                logger.log(Level.INFO, "Export complete")
             }
-        }
+            .onErrorResumeNext {
+                Completable.fromAction {
+                    logger.log(Level.WARNING, "Unable to finish export. Fix incorrect metadata and try again")
+                }
+            }
+            .subscribe()
     }
 
     fun split(outputDir: File) {
