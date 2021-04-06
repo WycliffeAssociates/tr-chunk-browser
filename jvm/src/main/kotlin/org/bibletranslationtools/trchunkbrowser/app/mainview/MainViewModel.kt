@@ -130,20 +130,6 @@ class MainViewModel : ViewModel() {
         clearSelected()
     }
 
-    fun merge(outputDir: File, segments: ObservableList<AudioSegment>) {
-        ExportSegments(segments)
-            .exportMerged(outputDir)
-            .observeOnFx()
-            .subscribe { result ->
-                if (result == ExportSegments.MergeResult.SUCCESS) {
-                    snackBarMessages.onNext(messages.getString("done_exporting"))
-                } else {
-                    snackBarMessages.onNext(messages.getString("export_error"))
-                }
-            }
-        clearSelected()
-    }
-
     fun deleteSelected() {
         segments.removeAll(selectedSegments)
         clearSelected()
