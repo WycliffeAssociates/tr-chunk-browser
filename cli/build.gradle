@@ -6,7 +6,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'edu.sc.seis.launch4j'
 
-version = '0.1.0'
+version = '0.2.0'
 
 application {
     mainClassName = "org.bibletranslationtools.trchunkbrowser.cli.Main"
@@ -41,3 +41,25 @@ shadowJar {
         )
     }
 }
+
+task copyJre(type: Copy) {
+    if (project.hasProperty("jrePath")) {
+        from jrePath
+        into "${buildDir}/launch4j/jre"
+    }
+}
+
+launch4j {
+    println(projectDir)
+    outfile = "${rootProject.name}-cli.exe"
+    mainClassName = "org.bibletranslationtools.trchunkbrowser.cli.Main"
+    bundledJrePath = "jre"
+    bundledJre64Bit = true
+    jdkPreference = 'jdkOnly'
+    jar = "${buildDir}/libs/${rootProject.name}-cli.jar"
+    headerType = "console"
+    productName = rootProject.name
+}
+
+project.tasks.createExe.dependsOn copyJre
+project.tasks.createExe.dependsOn shadowJar
