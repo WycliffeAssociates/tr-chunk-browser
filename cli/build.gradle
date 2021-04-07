@@ -50,7 +50,6 @@ task copyJre(type: Copy) {
 }
 
 launch4j {
-    println(projectDir)
     outfile = "${rootProject.name}-cli.exe"
     mainClassName = "org.bibletranslationtools.trchunkbrowser.cli.Main"
     bundledJrePath = "jre"
