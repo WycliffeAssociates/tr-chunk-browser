@@ -9,7 +9,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import javafx.util.Duration
-import org.bibletranslationtools.trchunkbrowser.app.controls.materialdialog.MaterialDialogContent
+import org.bibletranslationtools.trchunkbrowser.app.controls.materialdialog.DirectoryActionDialogContent
 import org.bibletranslationtools.trchunkbrowser.common.domain.Properties
 import tornadofx.*
 import java.util.*
@@ -58,17 +58,22 @@ class MainView : View() {
                     ))
                 }
             })
-            viewModel.confirmConvertDirectory.subscribe {
+            viewModel.confirmConvertDirectory.subscribe { dir ->
                 val dialog = JFXDialog().apply {
                     dialogContainer = this@stackpane
                     isOverlayClose = false
-                    content = MaterialDialogContent().apply {
+                    content = DirectoryActionDialogContent().apply {
                         title = messages.getString("convert_folder_title")
                         message = messages.getString("convert_folder_message")
-                        confirmButtonText = messages.getString("split").toUpperCase()
+                        splitConfirmButtonText = messages.getString("split").toUpperCase()
+                        mergeConfirmButtonText = messages.getString("merge").toUpperCase()
                         cancelButtonText = messages.getString("cancel").toUpperCase()
-                        confirmButton.action {
-                            viewModel.convertDirectory(it)
+                        splitConfirmButton.action {
+                            viewModel.splitDirectory(dir)
+                            close()
+                        }
+                        mergeConfirmButton.action {
+                            viewModel.mergeDirectory(dir)
                             close()
                         }
                         cancelButton.action {

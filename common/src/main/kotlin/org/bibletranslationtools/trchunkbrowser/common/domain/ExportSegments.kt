@@ -84,7 +84,7 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         }
     }
 
-    fun exportMerged(outputDir: File): Single<MergeResult> {
+    fun exportMerged(outputDir: File, isChapter: Boolean = false): Single<MergeResult> {
         val books = segments.map { it.bttrFile.metadata.slug }.distinct()
         val chapters = segments.map { it.bttrFile.metadata.chapter }.distinct()
         if (books.size > 1 && chapters.size > 1) return Single.just(MergeResult.ERROR_DIFFERENT_BOOK_CHAPTER)
@@ -100,7 +100,10 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
             val filename = generateFileName(segments.first().bttrFile.src, metadata)
-            val targetFile = outputDir.resolve(filename)
+            val targetFileName = if (isChapter) {
+                filename.replace(Regex("_v.*\\."), ".")
+            } else filename
+            val targetFile = outputDir.resolve(targetFileName)
 
             val bttrWavFile = BttrWavFile(
                 targetFile,
