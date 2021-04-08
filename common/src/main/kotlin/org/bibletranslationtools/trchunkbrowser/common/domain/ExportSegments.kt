@@ -99,6 +99,8 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             metadata.mode = MODE_CHUNK
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
+
+            if (!outputDir.exists()) outputDir.mkdirs()
             val filename = generateFileName(segments.first().bttrFile.src, metadata)
             val targetFileName = if (isChapter) {
                 filename.replace(Regex("_v.*\\."), ".")
