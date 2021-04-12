@@ -1,13 +1,12 @@
 package org.bibletranslationtools.trchunkbrowser.common.domain
 
-import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
-import com.matthewrussell.trwav.BITS_PER_SAMPLE
-import com.matthewrussell.trwav.Metadata
-import com.matthewrussell.trwav.WavFile
-import com.matthewrussell.trwav.WavFileReader
-import com.matthewrussell.trwav.WavFileWriter
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
+import org.bibletranslationtools.trchunkbrowser.common.model.audio.BttrChunk
+import org.bibletranslationtools.trchunkbrowser.common.model.audio.BttrMetadata
+import org.bibletranslationtools.trchunkbrowser.common.model.audio.BttrWavFile
+import org.wycliffeassociates.otter.common.audio.wav.*
 import java.io.File
 
 const val MODE_VERSE = "verse"
@@ -19,64 +18,80 @@ class ExportSegments(private val segments: List<AudioSegment>) {
         ERROR_DIFFERENT_BOOK_CHAPTER
     }
 
-    private val cache = hashMapOf<File, WavFile>()
-
-    private fun makeWavFile(segment: AudioSegment): WavFile {
-        // Get the source wav file
-        val source = segment.src
-        val file = if (cache.containsKey(source)) {
-            cache[source]!!
-        } else {
-            cache[source] = WavFileReader(source).read()
-            cache[source]!!
-        }
+    private fun makeBttrFile(segment: AudioSegment): BttrWavFile {
+        val bttrFile = segment.bttrFile
 
         // Sort markers
-        file.metadata.markers = file.metadata.markers.sortedBy { it.location }.toMutableList()
+        bttrFile.metadata.markers = bttrFile.metadata.markers.sortedBy { it.location }.toMutableList()
 
         // Find the marker
-        val markerIndex = file
+        val markerIndex = bttrFile
             .metadata
             .markers
             .filter { it.label == segment.label }
-            .map { file.metadata.markers.indexOf(it) }
+            .map { bttrFile.metadata.markers.indexOf(it) }
             .first()
 
-        val startAudioIndex = file.metadata.markers[markerIndex].location * BITS_PER_SAMPLE / 8
-        val endAudioIndex = if (markerIndex < file.metadata.markers.size - 1) {
-            file.metadata.markers[markerIndex + 1].location * BITS_PER_SAMPLE / 8
+        val startAudioIndex = bttrFile.metadata.markers[markerIndex].location * DEFAULT_BITS_PER_SAMPLE / 8
+        val endAudioIndex = if (markerIndex < bttrFile.metadata.markers.size - 1) {
+            bttrFile.metadata.markers[markerIndex + 1].location * DEFAULT_BITS_PER_SAMPLE / 8
         } else {
-            file.audio.size
+            bttrFile.audio.size
         }
-        val audioData = file.audio.copyOfRange(startAudioIndex, endAudioIndex)
+        val audioData = bttrFile.audio.copyOfRange(startAudioIndex, endAudioIndex)
         // Create the output wav file
-        val marker = file.metadata.markers[markerIndex].copy(location = 0)
-        val metadata = file.metadata.copy(markers = mutableListOf(marker))
+        val marker = bttrFile.metadata.markers[markerIndex].copy(location = 0)
+        val metadata = bttrFile.metadata.copy(markers = mutableListOf(marker))
         metadata.startv = segment.label
         metadata.endv = segment.label
-        return WavFile(metadata, audioData)
+
+        return BttrWavFile(bttrFile.src, bttrFile.wavFile, metadata, audioData)
+    }
+
+    private fun createWavFile(target: File, bttrWavFile: BttrWavFile) {
+        val bttrChunk = BttrChunk()
+        bttrChunk.metadata = bttrWavFile.metadata
+
+        val cueChunk = CueChunk()
+        bttrWavFile.metadata.markers.map {
+            cueChunk.addCue(it)
+        }
+
+        val wavFile = WavFile(
+            target,
+            bttrWavFile.wavFile.channels,
+            bttrWavFile.wavFile.sampleRate,
+            bttrWavFile.wavFile.bitsPerSample,
+            WavMetadata(listOf(bttrChunk, cueChunk))
+        )
+
+        WavOutputStream(wavFile).use {
+            it.write(bttrWavFile.audio)
+        }
     }
 
     fun exportSeparate(outputDir: File): Completable {
         return Completable.fromAction {
             for (segment in segments) {
-                val newWav = makeWavFile(segment)
+                val newWav = makeBttrFile(segment)
                 newWav.metadata.mode = MODE_VERSE
-                val filename = generateFileName(segment.src, newWav.metadata)
+                val filename = generateFileName(segment.bttrFile.src, newWav.metadata)
                 if (!outputDir.exists()) outputDir.mkdirs()
-                WavFileWriter().write(newWav, outputDir.resolve(filename))
+                val targetFile = outputDir.resolve(filename)
+
+                createWavFile(targetFile, newWav)
             }
         }
     }
 
-    fun exportMerged(outputDir: File): Single<MergeResult> {
-        val books = segments.map { it.sourceMetadata.slug }.distinct()
-        val chapters = segments.map { it.sourceMetadata.chapter }.distinct()
+    fun exportMerged(outputDir: File, isChapter: Boolean = false): Single<MergeResult> {
+        val books = segments.map { it.bttrFile.metadata.slug }.distinct()
+        val chapters = segments.map { it.bttrFile.metadata.chapter }.distinct()
         if (books.size > 1 && chapters.size > 1) return Single.just(MergeResult.ERROR_DIFFERENT_BOOK_CHAPTER)
         return Single.fromCallable {
-            val outputFiles = segments.map { makeWavFile(it) }
+            val outputFiles = segments.map { makeBttrFile(it) }
             val metadata = outputFiles.first().metadata
-            metadata.markers = outputFiles.map { Pair(it.metadata.markers, it.audio.size / (BITS_PER_SAMPLE / 8)) }
+            metadata.markers = outputFiles.map { Pair(it.metadata.markers, it.audio.size / (DEFAULT_BITS_PER_SAMPLE / 8)) }
                 .reduce { acc, pair ->
                     pair.first.forEach { it.location += acc.second }
                     Pair(acc.first.plus(pair.first).toMutableList(), acc.second + pair.second)
@@ -84,14 +99,27 @@ class ExportSegments(private val segments: List<AudioSegment>) {
             metadata.mode = MODE_CHUNK
             metadata.endv = outputFiles.last().metadata.endv
             val audioData = outputFiles.map { it.audio }.reduce { acc, bytes -> acc.plus(bytes) }
-            val filename = generateFileName(segments.first().src, metadata)
-            val wavFile = WavFile(metadata, audioData)
-            WavFileWriter().write(wavFile, outputDir.resolve(filename))
+
+            if (!outputDir.exists()) outputDir.mkdirs()
+            val filename = generateFileName(segments.first().bttrFile.src, metadata)
+            val targetFileName = if (isChapter) {
+                filename.replace(Regex("_v.*\\."), ".")
+            } else filename
+            val targetFile = outputDir.resolve(targetFileName)
+
+            val bttrWavFile = BttrWavFile(
+                targetFile,
+                outputFiles.first().wavFile,
+                metadata,
+                audioData
+            )
+
+            createWavFile(targetFile, bttrWavFile)
             MergeResult.SUCCESS
         }
     }
 
-    private fun generateFileName(sourceFile: File, newMetadata: Metadata): String {
+    private fun generateFileName(sourceFile: File, newMetadata: BttrMetadata): String {
         val takeInfo = "t\\d+$".toRegex().find(sourceFile.nameWithoutExtension)?.value
         return newMetadata.toFilename(takeInfo ?: "t01")
     }

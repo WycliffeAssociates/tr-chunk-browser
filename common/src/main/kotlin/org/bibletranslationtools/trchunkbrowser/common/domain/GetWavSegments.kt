@@ -4,12 +4,10 @@ import org.bibletranslationtools.trchunkbrowser.common.model.AudioSegment
 import io.reactivex.Single
 import java.io.File
 
-class GetWavSegments(private val wav: File) {
-    fun segments(): Single<List<AudioSegment>> = GetWavMetadata(wav)
-        .metadata()
-        .flatMap { metadata ->
-            GetWavDuration(wav).duration().map { duration ->
-                ConvertMetadataToSegments(metadata, wav, duration).segments()
-            }
+class GetWavSegments(private val file: File) {
+    fun segments(): Single<List<AudioSegment>> = GetBttrWavFile(file)
+        .get()
+        .map { wavFile ->
+            ConvertWavFileToSegments(wavFile).segments()
         }
 }

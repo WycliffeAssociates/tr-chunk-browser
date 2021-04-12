@@ -1,15 +1,13 @@
 package org.bibletranslationtools.trchunkbrowser.common.model
 
-import com.matthewrussell.trwav.Metadata
-import java.io.File
+import org.bibletranslationtools.trchunkbrowser.common.model.audio.BttrWavFile
 import java.util.regex.Pattern
 
 data class AudioSegment(
-    val src: File,
+    val bttrFile: BttrWavFile,
     val begin: Double,
     val end: Double,
-    val label: String,
-    val sourceMetadata: Metadata
+    val label: String
 ): Comparable<AudioSegment> {
     override fun compareTo(other: AudioSegment): Int {
         // Sort Audio Segments by Label first then by Begin
@@ -45,5 +43,4 @@ data class AudioSegment(
 
         return labelComparator.thenComparing(beginComparator).compare(this, other)
     }
-
 }

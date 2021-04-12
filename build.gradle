@@ -23,6 +23,7 @@ subprojects {
     repositories {
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
     }
 
     apply plugin: 'kotlin'
