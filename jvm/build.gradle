@@ -12,7 +12,7 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
-version = '0.2.3'
+version = '0.3.0'
 
 application {
     mainClassName = "org.bibletranslationtools.trchunkbrowser.app.MainKt"
@@ -21,7 +21,7 @@ application {
 dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlinVer"
     implementation "com.github.thomasnield:rxkotlinfx:$rxkotlinfxVer"
-    implementation "com.github.WycliffeAssociates:tr-wav:$trWavVer"
+    implementation "org.wycliffeassociates.otter.common:audio:$otterAudioVer"
     implementation "no.tornado:tornadofx:$tornadofxVer"
     implementation "org.apache.commons:commons-configuration2:$commonsConfig2Ver"
     implementation "commons-beanutils:commons-beanutils:$commonsBeanUtilsVer"
