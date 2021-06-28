@@ -68,8 +68,8 @@ class MainViewModel : ViewModel() {
             .subscribe()
     }
 
-    fun splitDirectory(dir: File) {
-        DirectorySplit(dir)
+    fun splitDirectory(inputDir: File, outputDir: File) {
+        DirectorySplit(inputDir, outputDir)
             .split()
             .doOnSubscribe {
                 snackBarProgress.onNext(0)
@@ -87,8 +87,8 @@ class MainViewModel : ViewModel() {
             .subscribe()
     }
 
-    fun mergeDirectory(inputDir: File) {
-        DirectoryMerge().merge(inputDir)
+    fun mergeDirectory(inputDir: File, outputDir: File) {
+        DirectoryMerge().merge(inputDir, outputDir)
             .doOnSubscribe {
                 snackBarProgress.onNext(0)
             }
