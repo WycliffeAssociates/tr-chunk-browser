@@ -8,6 +8,8 @@ import org.wycliffeassociates.otter.common.audio.wav.WavMetadata
 import java.io.File
 import java.io.RandomAccessFile
 
+const val WAV_HEADER_SIZE = 44
+
 class GetBttrWavFile(private val file: File) {
     fun get(): Single<BttrWavFile> = Single
         .fromCallable {
@@ -16,6 +18,7 @@ class GetBttrWavFile(private val file: File) {
             val wavFile = WavFile(file, wavMetadata)
             val audioData = ByteArray(wavFile.totalAudioLength)
             RandomAccessFile(file, "r").use {
+                it.skipBytes(WAV_HEADER_SIZE)
                 it.read(audioData)
             }
 

@@ -69,12 +69,17 @@ class MainView : View() {
                         mergeConfirmButtonText = messages.getString("merge").toUpperCase()
                         cancelButtonText = messages.getString("cancel").toUpperCase()
                         splitConfirmButton.action {
-                            viewModel.splitDirectory(dir)
                             close()
+                            chooseDirectory(messages.getString("choose_output_folder"))?.let {
+                                viewModel.splitDirectory(dir, it)
+                            }
+
                         }
                         mergeConfirmButton.action {
-                            viewModel.mergeDirectory(dir)
                             close()
+                            chooseDirectory(messages.getString("choose_output_folder"))?.let {
+                                viewModel.mergeDirectory(dir, it)
+                            }
                         }
                         cancelButton.action {
                             close()
